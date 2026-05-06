@@ -1,10 +1,11 @@
 package com.shadowSin.task_tracker.service;
 
 import java.util.List;
-import java.util.Optional;
+
 
 import org.springframework.stereotype.Service;
 
+import com.shadowSin.task_tracker.exception.TaskNotFoundException;
 import com.shadowSin.task_tracker.model.Task;
 import com.shadowSin.task_tracker.repository.TaskRepository;
 
@@ -21,8 +22,8 @@ public class TaskService {
         return taskRepository.findAll();
     }
 
-    public Optional<Task> getTaskById(Long id) {
-        return taskRepository.findById(id);
+    public Task getTaskById(Long id) {
+        return taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
     }
 
     public Task createTask(Task task) {

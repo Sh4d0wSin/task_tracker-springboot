@@ -1,7 +1,7 @@
 package com.shadowSin.task_tracker.controller;
 
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 
@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.shadowSin.task_tracker.model.Task;
+import com.shadowSin.task_tracker.dto.TaskRequest;
+import com.shadowSin.task_tracker.dto.TaskResponse;
+import com.shadowSin.task_tracker.mapper.TaskMapper;
 import com.shadowSin.task_tracker.service.TaskService;
 
 @RestController
@@ -22,31 +24,33 @@ import com.shadowSin.task_tracker.service.TaskService;
 public class TaskController {
 
     private final TaskService taskService;
+    private final TaskMapper taskMapper;
 
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService, TaskMapper taskMapper) {
         this.taskService = taskService;
+        this.taskMapper = taskMapper;
     }
 
     @GetMapping
-    public ResponseEntity<List<Task>> getTasks() {
-        return ResponseEntity.ok(taskService.getAllTasks());
+    public ResponseEntity<List<TaskResponse>> getTasks() {
+        return ResponseEntity.ok(taskService.getAllTasks().stream().map(taskMapper::taskIntoResponse).collect(Collectors.toList()));
 
     }
 
    
     @GetMapping("/{id}")
-    public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
-        return ResponseEntity.ok(taskService.getTaskById(id));
+    public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id) {
+        return ResponseEntity.ok(taskMapper.taskIntoResponse(taskService.getTaskById(id)));
     }
 
     @PostMapping
-    public ResponseEntity<Task> postTask(@RequestBody Task task) {
-        return ResponseEntity.status(201).body(taskService.createTask(task));
+    public ResponseEntity<TaskResponse> postTask(@RequestBody TaskRequest taskRequest) {
+        return ResponseEntity.status(201).body(taskMapper.taskIntoResponse(taskService.createTask(taskMapper.requestIntoTask(taskRequest))));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody Task task) {
-        return ResponseEntity.ok().body(taskService.updateTask(task, id));
+    public ResponseEntity<TaskResponse> updateTask(@PathVariable Long id, @RequestBody TaskRequest taskRequest) {
+        return ResponseEntity.ok().body(taskMapper.taskIntoResponse(taskService.updateTask(taskMapper.requestIntoTask(taskRequest), id)));
     }
 
     @DeleteMapping("/{id}")

@@ -19,6 +19,8 @@ import com.shadowSin.task_tracker.dto.TaskResponse;
 import com.shadowSin.task_tracker.mapper.TaskMapper;
 import com.shadowSin.task_tracker.service.TaskService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {
@@ -44,12 +46,12 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskResponse> postTask(@RequestBody TaskRequest taskRequest) {
+    public ResponseEntity<TaskResponse> postTask(@Valid @RequestBody TaskRequest taskRequest) {
         return ResponseEntity.status(201).body(taskMapper.taskIntoResponse(taskService.createTask(taskMapper.requestIntoTask(taskRequest))));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TaskResponse> updateTask(@PathVariable Long id, @RequestBody TaskRequest taskRequest) {
+    public ResponseEntity<TaskResponse> updateTask(@PathVariable Long id, @Valid @RequestBody TaskRequest taskRequest) {
         return ResponseEntity.ok().body(taskMapper.taskIntoResponse(taskService.updateTask(taskMapper.requestIntoTask(taskRequest), id)));
     }
 

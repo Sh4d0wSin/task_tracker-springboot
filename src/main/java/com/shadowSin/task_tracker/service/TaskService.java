@@ -42,7 +42,9 @@ public class TaskService {
     }
 
     public void deleteTask(Long id) {
-        taskRepository.deleteById(id);
+        Task found = getTaskById(id);
+        taskRepository.deleteById(found.getId());
+
     }
 
 

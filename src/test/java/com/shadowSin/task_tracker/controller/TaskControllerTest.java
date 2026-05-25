@@ -16,9 +16,14 @@ import com.shadowSin.task_tracker.mapper.TaskMapper;
 import com.shadowSin.task_tracker.model.Task;
 import com.shadowSin.task_tracker.service.TaskService;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+
 import org.springframework.http.MediaType;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class TaskControllerTest {
@@ -73,6 +78,39 @@ public class TaskControllerTest {
         when(taskService.createTask(dummy)).thenReturn(dummy);
         when(taskMapper.taskIntoResponse(dummy)).thenReturn(dummyResponse);
         mockMvc.perform(post("/tasks").contentType(MediaType.APPLICATION_JSON).content("{\"title\":\"test\",\"description\":\"test\",\"completed\":false}")).andExpect(status().isCreated());
+
+    }
+
+    @Test
+    public void testPostTaskSad() throws Exception {
+
+        mockMvc.perform(post("/tasks").contentType(MediaType.APPLICATION_JSON).content("{\"title\":\"\",\"description\":\"test\",\"completed\":false}")).andExpect(status().isBadRequest());
+        
+
+    }
+
+    @Test
+    public void testUpdateTask() throws Exception {
+        Task dummy = new Task();
+        dummy.setId(1L);
+
+        TaskRequest dummyRequest = new TaskRequest(dummy.getTitle(), dummy.getDescription(),  dummy.isCompleted());
+        TaskResponse dummyResponse = new TaskResponse(dummy.getId(),dummy.getTitle(), dummy.getDescription(), dummy.isCompleted());
+
+        when(taskMapper.requestIntoTask(dummyRequest)).thenReturn(dummy);
+        when(taskService.updateTask(any(Task.class), eq(1L))).thenReturn(dummy);
+        when(taskMapper.taskIntoResponse(dummy)).thenReturn(dummyResponse);
+
+        mockMvc.perform(put("/tasks/1").contentType(MediaType.APPLICATION_JSON).content("{\"title\":\"test\",\"description\":\"test\",\"completed\":false}")).andExpect(status().isOk());
+
+    }
+
+
+    @Test
+    public void testDeleteTask() throws Exception {
+
+        
+        mockMvc.perform(delete("/tasks/1")).andExpect(status().isNoContent());
 
     }
 

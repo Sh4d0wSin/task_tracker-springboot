@@ -82,6 +82,10 @@ Task with 99 not found
 }
 ```
 
+## Testing the API Manually
+
+[Postman](https://www.postman.com/downloads/) is recommended for exploring the API. Once the app is running, create a new request in Postman, set the method and URL, add a JSON body for POST/PUT requests, and hit Send.
+
 ## Running Tests
 
 ```bash
